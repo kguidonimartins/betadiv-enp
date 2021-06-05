@@ -31,3 +31,10 @@ betadiv-enp/
 ├── output/         # stores tables, figures, and appendices.
 └── R/              # stores analysis routines and custom functions
 ```
+
+## Acknowledgements
+
+This research was funded by [CNPq](https://www.gov.br/cnpq/pt-br), [CAPES](https://www.gov.br/capes/pt-br), and [FAPEG](http://www.fapeg.go.gov.br/).
+
+We also thank the amazing [`#rstats`](https://twitter.com/search?q=%23rstats&src=typed_query) community, making it possible to build this research paper using only free/open source tools.
+
