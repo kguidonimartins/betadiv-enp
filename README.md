@@ -1,7 +1,7 @@
 # betadiv-enp
 
-
-<!-- TODO: add badges -->
+[![docker-upload-artifacts](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-upload-artifacts.yaml/badge.svg)](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-upload-artifacts.yaml)
+[![docker-build-push](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-build-push.yaml/badge.svg)](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-build-push.yaml)
 
 Code, data, and author's manuscript accompanying the publication:
 
@@ -9,7 +9,7 @@ Code, data, and author's manuscript accompanying the publication:
 
 ## Overview
 
-This repository host the code, data, and manuscript source of the publication.
+This repository host the code, data, and manuscript source of the publication mentioned above.
 
 We adopt a routine to ensure that all statistical analyses and the production of the figures using the R environment are reproducible. Thus, users interested in checking these steps have **three alternatives**:
 
