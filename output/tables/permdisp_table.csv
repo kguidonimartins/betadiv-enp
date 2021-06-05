@@ -1,0 +1,5 @@
+name,term,Df,Sum Sq,Mean Sq,F,N.Perm,Pr(>F)
+Sorensen,Fire frequency,1,0.006244,0.006244,1.359,999,0.266
+Simpson (turnover),Fire frequency,1,0.013514,0.013514,1.643,999,0.189
+Richness difference (nestedness),Fire frequency,1,0.000944,0.000944,0.626,999,0.454
+Bray-Curtis,Fire frequency,1,0.009834,0.009834,1.967,999,0.163

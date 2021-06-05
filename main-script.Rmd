@@ -1,0 +1,450 @@
+---
+title: "Annual fires reduce local species richness but do not homogenize the composition of savanna woody species"
+author:
+- Karlo G. Guidoni-Martins^a^\*, Leandro Maracahipes^b,c^, Adriano S. Melo^d^, Marcus V. Cianciaruso^e^
+- ^a^Programa de Pós-Graduação em Ecologia e Evolução, Universidade Federal de Goiás, CP 131, Goiânia, GO, CEP 74001-970, Brazil
+- ^b^Instituto de Pesquisa Ambiental da Amazônia (IPAM), Brasília, DF, Asa Norte CLN 211 B1 B Sala 201 - Asa Norte, CEP 70863-520, Brazil
+- ^c^Instituto de Biologia, University of Campinas (UNICAMP), Campinas, SP 13083-970, Brazil
+- ^d^Departamento de Ecologia, IB, Universidade Federal do Rio Grande do Sul, Av. Bento Gonçalves 9500, Porto Alegre, RS, CEP 91501-970, Brazil
+- ^e^Departamento de Ecologia, ICB, Universidade Federal de Goiás, CP 131, Goiânia, GO, CEP 74001-970, Brazil
+- <br/>
+- <br/>
+- <br/>
+- \*Corresponding author
+- \***kguidonimartins@gmail.com** (K G. Guidoni-Martins), lmaracahipes@gmail.com (L. Maracahipes), asm.adrimelo@gmail.com (A.S. Melo), cianciaruso@gmail.com (M.V. Cianciaruso)
+output:
+  word_document:
+    reference_docx: manuscript/sources/template.docx
+    keep_md: true
+bibliography: manuscript/sources/bibliography.bib
+csl: manuscript/sources/flora.csl
+---
+
+
+```{r setting_params, include = FALSE}
+
+if (!require("here")) install.packages("here")
+
+# turn off results when compiling the main-script.Rmd
+params <- list()
+params$show_results <- FALSE
+
+```
+
+
+<!--
+The following chunk (analysis_and_figures) need to be empty.
+R/analysis.Rmd run all analysis and create figures.
+Some objects created there are used here to extract results
+and embed them in the main text.
+-->
+
+
+```{r analysis_and_figures, child = here::here("R", "analysis.Rmd"), eval = TRUE}
+```
+
+
+```{r knitr_setup_for_main_script, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  eval = TRUE,
+  include = FALSE,
+  cache = TRUE,
+  root.dir = here::here()
+)
+
+```
+
+
+```{r figure_and_captions}
+
+TABLE_CAPTION_PERMANOVA <- table_cap(
+  name = "permanova-table",
+  caption = "Results of PERMANOVA analyses. After taking into account spatial effects using the paired sampling design, fire frequency has a small effect in community composition and structure. No effect was found on richness difference."
+)
+
+
+TABLE_CAPTION_PERMDISP <- table_cap(
+  name = "permdisp-table",
+  caption = "Results of PERMDISP analyses. Dispersion of dissimilarities did not differ between fire frequencies. Degrees of freedom is 1 for the fire frequency and 38 for the residuals."
+)
+
+
+TABLE_CAPTION_LM <- table_cap(
+  name = "tab-linear-model",
+  caption = "Results of the permutation procedure to compare intercepts and slopes of the distance decay in similarity relationships in natural and high fire frequencies treatments. Similarity in both treatments tended to decrease with distance. No effect was found on richness difference."
+)
+
+
+TABLE_CAPTION_ABUNDANCE_COMPARISON <- table_cap_supp(
+  name = "abund-comparison",
+  caption = "Species abundances in the high and natural fire frequency regimes."
+)
+
+
+FIGURE_CAPTION_MAP_EMAS <-
+  figure_cap(
+    name = "map-emas",
+    caption = "Location of the sampling pairs (white squares) in the Emas National Park (ENP), GO, Brazil. Pairs were located at least 1 km apart. The figure at the top right indicates the location of ENP (white circle) within the Cerrado biome (dark gray) in South America (light gray)."
+  )
+
+
+FIGURE_CAPTION_T_TEST <-
+  figure_cap(
+    name = "t-test",
+    caption = "Paired comparison of woody species richness between communities under natural fire frequency and high frequency of fire. Dashed line represents pairs of sites in which woody species richness was greater in higher fire frequency than in natural fire frequency. Circles representing sampling sites with the same woody species richness are overlaid (darker gray). In general, communities under natural fire frequency were richer than communities under high fire frequency."
+  )
+
+
+FIGURE_CAPTION_PCOA <-
+  figure_cap(
+    name = "pcoa",
+    caption = "PCoA ordination of woody plant community structure in samples subjected to high and natural fire frequencies. Lines connect pairs of sampling units (each sampling unit under a different fire frequency). There is no difference in dissimilarities' dispersion between natural and high fire frequency, regardless of the dissimilarity index."
+  )
+
+
+FIGURE_CAPTION_DISTANCE_DECAY <-
+  figure_cap(
+    name = "distance-decay",
+    caption = "Similarity decay of woody species communities along our spatial gradient. Each point represents a comparison pair of the distance matrix. Similarities in both high and natural fire regimes decreased in the same rate with spatial distance, except for the Richness difference."
+  )
+
+```
+
+
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+
+
+# ABSTRACT
+
+
+Savanna woody species evolved with fire. However, the effect of changes in the fire regimes, which tend to increase in the next decades, is not yet fully understood. Here, we tested the effects of increased fire frequency on species richness and the composition of woody plant communities. Specifically, we tested if a high frequency fire management reduces local species richness of communities and homogenizes species composition. We sampled woody plants in 40 sites, distributed in 20 pairs, in Emas National Park (Brazil). Each pair included sites with high fire frequency (firebreaks that are burned annually since 1994) and with natural fire frequency (occurring every 3-5 years). We used a paired t-test to assess effects of the two fire frequency treatments on species richness and permutation tests to compare distance decay in similarity composition and relative abundances. We found that sites with high fire frequency had lower species richness compared to their paired sites subjected to natural fire frequency. However, similarities in species composition among sites with high fire frequency were only slightly higher than among sites subjected to natural fire frequency. The rate of distance decay in similarity was similar on the two treatments. At local scales, the high frequency of fire reduced species richness, an impact that in the long run may be irreversible. However, at broader spatial scales, effects were small as two treatments included similar sets of species. Prescribed fires have the potential to modify the natural dynamics of the woody communities in the savannas we studied. In our study, fire appears to act as a hierarchical filter, selecting species at broader spatial scales and nesting communities at local scales.
+
+
+*Keywords:* beta diversity; Cerrado; fire management; Neotropical savanna
+
+
+# 1. Introduction
+
+
+Understanding how biological communities respond to disturbances has been one of the main goals of Ecology [@Grime_1973; @Connell_1978; @McLauchlan2020; @Pausas2017a; @Pausas2019]. Fire is one of the principal types of disturbance and along with other factors such as grazing, climate, and soil plays a fundamental role shaping biodiversity in savanna ecosystems [@Buisson_2018; @Pausas2019]. Indeed, there is evidence that fire is the main factor that maintains alternative states of Neotropical savannas [@Dantas2016; @Pausas2020]. Despite our knowledge about the potential of fire in altering structure and dynamics of plant communities in savannas [@Cianciaruso2012; @Dantas2013a; @Govender_2006; @Higgins_2000; @Lehmann_2014; @Maracahipes2014; @Silva2010], studies about the role of frequent fires on the spatial variation of species composition in Neotropical savannas are still lacking. Identifying how fire regimes controls the spatial structure of communities is essential to predict changes in both the species richness and composition in future climatic scenarios in which the frequency, duration, extent, and intensity of anthropogenic and wildfires are expected to increase [@Bowman2009; @Dale2001; @Field2014].
+
+
+Fire promotes landscape heterogeneity [@Pausas2017c] and can lead to differences or similarities in species composition among communities (beta-diversity), via distinct mechanisms [@Dantas2016; @Myers2015]. For example, convergence of species composition may emerge when fire selects similar sets of species [tolerant species; @Laliberte2013a]. In this case, communities subjected to frequent disturbances may be composed by a subset of species from undisturbed communities [a pattern known as nestedness; @Ulrich2012] or by exclusively fire-resistant species. On the other hand, divergence in species composition may emerge when a disturbance interacts with environmental filters along environmental gradients [@Myers2015]. In the case of fire, communities along gradients may have distinct species compositions because fire effects depend on local conditions [for example, the amount of standing dry biomass [@Gomes2018] which can be controlled by soil characteristics along gradients].
+
+
+Changes in beta-diversity in consequence of different fire regimes are important information for fire management in protected areas. Tropical grasslands and savannas naturally burn every 2-5 years, mostly due to lightning strikes in the beginning of the rainy season [@Franca2007a; @Ramos-Neto2000]. To prevent fire propagation inside protected areas large strips of vegetation (firebreaks) are burned annually, often during the dry season [@Ramos-Neto2000]. This resembles the anthropogenic fire regimes that occur over large areas with native vegetation in the Cerrado [@Miranda_2009]. The effects of the specific fire regime in firebreaks thus allow us to predict the consequences of high fire frequency on plant communities. Even if savanna plant species are adapted to natural fire that occur in the beginning of the rainy season [October -- May; @Bond2001; @Gignoux1997; @Gignoux2016a; @Pausas2017a], both high fire frequencies and burning during the dry season may deplete carbohydrate and nutrients which are essential to post-fire regrowth [@Miyanishi1986] and increase the mortality of savanna woody species [@Hoffmann1996]. As a consequence, recurrent anthropogenic fires should select those woody species that are extremely resistant or resilient to high fire frequencies [@Cianciaruso2012].
+
+
+Additionally, the spatial scale of fire occurrence is important [@Bond2008; @Pausas2017]. For example, high fire frequency occurring in large patches homogenizes species composition [@Pausas2008] and drives the functional clustering of plants [@Silva2010]. Large and frequent fires affect the regional species pool by reducing both the chance of species to colonize open areas and the survival of species [@Dickson2008; @Lloret2005]. Thus, the similarity of species composition of communities affected by large and frequent fires is expected to be high [@Mouquet2003]. Conversely, fires occurring at local scales and in high frequencies create a mosaic landscape with habitat patches differing in frequency and time since the last fire [@Burkle2015]. In this scenario, annually burned patches are expected to present lower woody species richness in relation to patches experiencing natural fires [which occur in the Cerrado every 2-5 years due to lightning strikes; @Pereira_J_nior_2014; @Ramos-Neto2000]. Patches under natural fires are exposed to both different fire frequencies and intensities, which selects different species groups resistant to these conditions. Contrarily, firebreaks are burned annually during the dry season with the aid of drip torches. The differences between natural fires and high frequency anthropogenic fires should lead to distinct beta diversity patterns. Annual dry season fires employed in firebreaks should homogenize species composition and cause reduced beta diversity compared to areas with natural fire regimes. Identifying these patterns in different spatial scales can reveal the processes that maintain beta diversity and improve our knowledge on the consequences of annually burned firebreaks on woody species diversity.
+
+
+We tested the effect of high fire frequency (firebreaks burned annually during the dry season) on species richness and community structure of savanna woody species. We expect that species richness of the communities under high fire frequency is lower than those under natural fire regimes (areas naturally burned every 2-5 years by lightning strikes, mainly during the transition between dry to wet season). Also, high fire frequency should homogenize communities and, thus, beta diversity among communities subjected to high fire frequency should be lower than that among natural fire regimes.
+
+
+# 2. Material and Methods
+
+
+## *2.1 Study sites and sampling*
+
+We conducted the study at Emas National Park (ENP), one of the largest Cerrado reserves located in the Brazilian Central Plateau (`r figure_ref(FIGURE_CAPTION_MAP_EMAS)`). The park covers an area of 132,941 hectares and the vegetation is a mosaic of open savannas (68.1% of its area), woodland savannas (25.1%), wet grasslands (4.9%), and riparian and semi-deciduous forest formations (1.2%). Climate is classified as tropical humid, with dry winters (June -- September) and wet summers (October -- May). The annual rainfall varies from 1,200 to 2,000 mm, and the average annual temperature is 24.6 °C [@Ramos-Neto2000]. We conducted our sampling in areas of open savannas.
+
+
+The ENP was created in 1961, but was burned annually in the dry season between 1963 and 1984 to promote forage regrowth, which in that period was exploited for cattle ranching [@Franca2007a]. In 1984 the park was fenced and a fire exclusion policy was applied [@Ramos-Neto2000]. Consequently, several catastrophic wildfires occurred due to biomass accumulation. Since 1994, a network of 340 km of firebreaks is burned annually to control the spreading of fire inside the park [@Ramos-Neto2000]. However, the firebreaks did not avoid all the uncontrolled wildfires and extensive wildfires still occur in the park. For instance, in years of extreme drought, as in 2005 and 2010 wildfires burned, respectively, 50% and 98% of the total area of the park [@Silva2011].
+
+
+During the wet season of 2017, we sampled 40 sites, distributed in 20 pairs along 35 km of firebreaks (`r figure_ref(FIGURE_CAPTION_MAP_EMAS)`). Each pair included woody plant assemblages (shrubs and trees) subjected to two distinct fire treatments: a high fire frequency (50 m wide firebreaks burned annually since 1994 at the beginning of the dry season) and a moderate fire frequency (natural fires, burned every 3-5 years, mostly at the transition between dry and wet seasons). On average, the number of fires between 1994 and 2016 in these sites was 5.86 ± 0.52 (mean ± standard deviation). Distance between pairs varied between 1 and 34 km. In each sample site, we recorded 60 woody plant individuals. Each sample site consisted of 15 points systematically spaced 20 m from each other along a line of 300 m. In each point, we used the point-quarter method [@Mueller-Dombois1974] to sample four living woody individuals in the shrub-tree layer with at least 10 cm of diameter at ground level.
+
+
+## *2.2 Data analyses*
+
+
+We tested the effect of fire frequency on species richness using a paired t-test. As the number of individuals in each sample was fixed (60 individuals), standardization of sample effort using rarefaction was unnecessary. Our hypothesis regarding species richness is that high fire frequency reduces species richness and, thus, a one-tailed test was employed.
+
+
+We assessed resemblance among communities subjected to natural and high fire frequencies using a permutational multivariate analysis of variance [PERMANOVA; @Anderson2001]. This analysis is based on the partitioning of the sum of squares of dissimilarity matrices between treatments (fire frequency) and among sample pairs, as the latter takes into account the spatial structure of the sampling design. If high fire frequency changes species composition, we expect to observe a large difference in species composition between fire treatments. Dissimilarities were obtained either for species composition and community structure (species composition and relative abundances) using Sorensen and Bray-Curtis indices, respectively. Our field sampling avoided differences in abundance among samples as well as large discrepancy in abundance values. Accordingly, Bray-Curtis dissimilarities were obtained using raw abundance data. We decomposed Sorensen's total dissimilarity into turnover and species richness differences [@Baselga2010]. Turnover represents species replacement without the influence of species richness among sampling sites along our spatial gradient. When two communities have the same number of species, the dissimilarity emerges from differences in species identity between those communities. In this case, Sorensen's total dissimilarity is equal to Simpson's dissimilarity [@Baselga2010]. Thus, we refer to our results based on turnover as Simpson (turnover). In contrast, species richness difference informs that communities differ in species richness. For instance, even if all species in one site are present in the other site, differences may occur as the species rich site includes species not observed in the species poor site. When that difference occurs orderly (i.e., when one community has a subset of species richness from another community), this phenomenon is classified as nestedness [@Baselga2010]. Nestedness is calculated by subtracting Simpson's dissimilarity from Sorensen's total dissimilarity [@Baselga2010]. We refer to our results based on species richness difference as richness difference (nestedness).
+
+
+We used two approaches to test the effect of fire frequency on beta diversity among communities. First, we used the multivariate dispersion analysis to verify the homogeneity of dissimilarity values within the
+treatments [PERMDISP; @Anderson2006]. If high fire frequencies homogenize communities, we may expect lower overall dissimilarity among sites subjected to high fire frequency (i.e., low dispersion in the ordination) compared to those dissimilarities among sites subjected to natural fire regimes. PERMDISP does not allow inclusion of a second predictor and, thus, it was not possible to take spatial effects into account. In our second approach, however, we took space into account by using distance decay in similarity analyses. We regressed (Ordinary Least Square) the similarities (1 - dissimilarity) against the Euclidean distances of spatial coordinates pairwise sites within each fire frequency to assess how similarities within each fire treatment decay with distance and, thus, only within-treatment similarities were used. Because similarity values were not independent to each other (samples were used multiple times), we used a permutation procedure to estimate probabilities that differences in intercept and slope between the two fire treatments were produced by chance. In our permutation procedure, the triangular matrices of similarities calculated separately for the two treatments were unfolded into a single vector. The same procedure was repeated for spatial distances, which were paired with their respective similarities. We adjusted linear regression models (similarities against spatial distances) for each treatment group, obtained the coefficients for intercept and slope and recorded the differences between the two treatments. Next, we permuted labels of the two treatment groups, maintaining each similarity value paired with its respective spatial distance. Regressions were fit and differences in coefficients of permuted groups recorded. We repeated this procedure 9999 times and estimated the chance the observed differences in coefficients were generated simply by chance as the proportion of differences obtained in the 9999 permutation that were equal or more extreme than those obtained using the original data (two-tailed test). If high fire frequency homogenizes species composition, we expect to observe a flat relationship between similarities within high fire frequency and spatial distances while observing a distance-decay relationship between similarities within natural fire frequency and spatial distances. Thus, our regression results should present significant differences between intercept and slope coefficients of fire treatments. PERMDISP and the similarity decay analyses were done using the Sorensen and Bray-Curtis dissimilarities as well as the Simpson (turnover) and species richness difference (nestedness) components of the former.
+
+
+All analyses were done using the R environment [@r-core-team]. Multivariate analyses (dissimilarity matrices, PERMANOVA, and PERMDISP) were done using the *vegan* and *betapart* packages [@vegan; @betapart]. We wrote R scripts to compute the permutation tests.
+
+
+# 3. Results
+
+
+```{r get_t_test_results}
+
+t_value <-
+  t_test_result %>%
+  tidy() %>%
+  select(statistic) %>%
+  pull() %>%
+  round(2)
+
+# one tailed
+p_value_t_test <-
+  t_test_result %>%
+  tidy() %>%
+  select(p.value) %>%
+  pull() %>%
+  { . / 2 } %>%
+  round(3)
+
+tdf <-
+  t_test_result %>%
+  tidy() %>%
+  dplyr::select(parameter) %>%
+  pull() %>%
+  paste0(.)
+
+```
+
+
+```{r get_communitites_table}
+
+df <-
+  read_csv(here::here("data", "community-table.csv")) %>%
+  column_to_rownames("plot")
+
+```
+
+
+We recorded a total of `r sum(df)` tree and shrub individuals (`r sum(df[1, ])` individuals in each of the `r nrow(df)` sampling units) distributed among `r ncol(df)` woody species (`r table_ref(TABLE_CAPTION_ABUNDANCE_COMPARISON)`). A total of `r unburned_richness` and `r burned_richness` woody species were sampled in sites with the natural fire and high fire frequencies treatments, respectively. Most samples under natural fire frequency had higher woody species richness than their counterparts under high fire frequency (`r n_higher_richness` out of `r nrow(richness_wider)` pairs; *t*~`r tdf`~ = `r t_value`, *p* = `r p_value_t_test`; `r figure_ref(FIGURE_CAPTION_T_TEST)`). Thus, we corroborate the hypothesis that communities under high fire frequency have lower species richness at both local (paired sites) and regional (overall species richness in the two treatments) scales.
+
+
+We found that, after taking into account spatial effects using the paired sampling design, fire frequency changed community composition and structure (`r table_ref(TABLE_CAPTION_PERMANOVA)`). Yet, the effects were small compared to the high variation in species composition and structure due to space (`r figure_ref(FIGURE_CAPTION_PCOA)`). In fact, communities under high fire frequency were almost totally superposed on the multivariate space defined by communities under natural fire frequency, indicating they have only slightly dissimilar species composition (`r figure_ref(FIGURE_CAPTION_PCOA)`).
+
+
+Dispersion of samples in the ordination space was similar for the two treatments, indicating they have overall similar beta diversity (`r table_ref(TABLE_CAPTION_PERMDISP)`; `r figure_ref(FIGURE_CAPTION_PCOA)`). The slopes of the distance decay of similarity were similar for the two fire frequency treatments (`r table_ref(TABLE_CAPTION_LM)`; `r figure_ref(FIGURE_CAPTION_DISTANCE_DECAY)`). Similarity in species composition among samples subjected to high fire regime was slightly higher than among those samples subjected to natural fire frequency except for the species richness difference components of Sorensen index (`r figure_ref(FIGURE_CAPTION_DISTANCE_DECAY)`; `r table_ref(TABLE_CAPTION_LM)`). Yet, species composition changed more in function of the spatial distance than in function of fire frequency (`r figure_ref(FIGURE_CAPTION_DISTANCE_DECAY)`). Unexpectedly, similarity due to differences in species richness increased with the distance (`r figure_ref(FIGURE_CAPTION_DISTANCE_DECAY)`).
+
+
+# 4. Discussion
+
+
+We investigated differences between sites with high fire frequency (annual fires) and with natural fire frequency (burned every 3 to 5 years) regarding woody species richness and woody species community composition in a Neotropical savanna. We found that high fire frequency reduces woody species richness locally, leading to a subset of species from sites with natural fire frequency (`r figure_ref(FIGURE_CAPTION_T_TEST)`). Also, total number of woody species observed in all high fire frequency samples (`r burned_richness`) was lower than that observed in natural fire regime (`r unburned_richness`). Similarity between samples in the high fire treatment tended to be slightly higher and significant than between those under natural fire frequency when controlled for spatial distances. Yet, even if firebreaks are burned during the dry season and at much higher frequency than natural fires, this did not affect the overall woody species composition at the larger scales, encompassing all samples irrespective of spatial distance (`r figure_ref(FIGURE_CAPTION_PCOA)`. The decay of similarity of the woody species composition with the spatial distance was similar for the two fire frequencies (`r figure_ref(FIGURE_CAPTION_DISTANCE_DECAY)`).
+
+
+These results reveal that the fire management done in ENP may have small effects on the homogenization of woody species composition (i.e., species composition under different fire frequencies are similar). However, annual burns in the firebreaks reduce woody species richness at local and regional scales. This indicates that high fire frequency resulted in local communities that were a subset of the nearby communities under natural fire frequency. Cerrado woody species have fire-adaptative traits that allow their establishment, persistence, and reproduction even under severe fire conditions [@Batalha2011a; @Cianciaruso2012]. However, repeated annual fires at the dry season can extirpate species from local communities by preventing individuals to attain high heights, stem diameter, and thick bark, important traits related to fire-escape in savannas [@Hoffmann2012; @Maracahipes2018; @Medeiros2008]. In addition, as most of the species concentrates seed maturation in the beginning of the wet season, dry season fire can have negative impacts for their population dynamics [@Hoffmann1998; @Hoffmann2002a]. Because frequent fire reduces the plant height and basal area [@Medeiros2008], our results suggest that the species impoverishment in areas under high fire frequency maybe a consequence of tree topkill, in which vegetative and reproductive structures of woody species are constantly removed by fire [@Hoffmann2009; @Souchie2017]. Even if savanna woody species have traits that enable them to resist fire, these traits usually are not present in saplings or juveniles. For example, in early ontogenetic stages, woody plants do not have sufficient thick bark to escape fire [@Maracahipes2018; @Pausas2015c]. Our sampling strategy, which recorded individuals with a diameter above 10 cm, likely did not include those juveniles. However, the fact that the fire management is conducted during the dry season may result in harsher conditions to species establishment and survival [@Rissi_2017]. During the dry season, high air temperatures coupled with low soil humidity can make fires more severe for species in the firebreaks, so we cannot expect high seedling recruitment of woody species. In the long term, some species submitted to these conditions can no longer persist and establish in these areas due to the mismatch between anthropogenic fire regime and their natural population dynamics [@Hoffmann2002a].
+
+
+At the regional scale, we did not observe differences in the community structure (species composition and relative abundances) between the areas with natural and high fire frequency (`r figure_ref(FIGURE_CAPTION_PCOA)`). Cerrado woody species have evolved under fire [@Pausas2017c; @Simon2012], but we expected a negative effect of the high fire frequency for the beta diversity. Our results reinforce previous findings [@Cianciaruso2012; @Scalon2019; @Simon2012] about the convergence of species strategies to deal with fire; surprisingly, even in high fire frequency, the differences in community structure did not change. However, both modeling and observational studies have found structural changes of the communities when under different fire frequency [@Dantas2013a; @Hoffmann1999]. For instance, individuals tend to have reduced stem size due to the repeated topkilling under high fire frequency. Furthermore, as stem size is closely related to plant survival, reproduction, and growth [@Bond1996], it is probable that despite surviving in the firebreaks these individuals are not reproducing [@Zirondi_2021]. The effects of high fire frequency on woody species reproduction is still an open question that deserves future investigation to best understand the consequences of fire management and species response to anthropogenic fires that are becoming larger and more frequent.
+
+
+Contrary to our expectation, fire had no effect in changing woody community structure at our larger scale (entire study). The decay of similarity of species composition among communities along spatial distances is known for this savanna [@Dantas2015] and for others vegetation types [@Nekola1999; @Reilly2006]. Our results indicate that the decay rate (slope) of these relationships were similar for the two fire treatments and the mean similarity were only slightly higher in the high fire frequency. Other factors can act shaping the beta diversity along spatial gradients. Soil features, nutrient and water availability, and topography can interact with fire frequency generating changes in species composition [@Batalha2011a; @Dantas2015]. Also, since fire occurs in a patchy way, communities protected from fire are a source of new individuals that can colonize the new areas opened by fire, thus influencing the species turnover [@Catano2017; @Reilly2006a]. Due the effect of recurrent fire on the sexual reproduction of shrubs and trees [@Hoffmann2002a], this distance-decay pattern also can be generated by dispersal limitation (species recruitment mostly by resprouting).
+
+
+# 5. Conclusions
+
+
+Understanding the effect of fire on diversity is important to both theoretical and practical perspectives. Identifying how ecological communities respond to fire can help us to predict future scenarios in which the frequency of this disturbance is likely to increase. Also, this knowledge can serve to inform management of fire-prone vegetation. Here, we found that fire had an important effect on species richness of woody plants at local and regional scales. Yet, fire had only subtle effects on the homogenization of this savanna. Thus, fire seems to act as a hierarchical filter, selecting species from the species pool at regional scales and decreasing species richness at local scales. It should be noted, however, that our high frequency fire samples were immersed in a landscape of natural fire regimes. Increased fire frequencies expected to occur under future climate and that will affect vast areas should produce stronger effects.
+
+
+# Acknowledgements
+
+
+ASM and MVC received fellowship from Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq, no. 307587/2017-7 and 306590/2018-2). This study was partially funded by Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Finance Code 001, CNPq -- PELD Sítio 13 (441214/2016-9) and FAPEG. We thank Cleber ten Caten and Ismaiara Vaz for helping us in the field. We also thank the two anonymous reviewers and the subject editor for suggestions to improve our manuscript.
+
+
+# Research data
+
+
+Data, text, and code to reproduce analyses, figures, and the entire manuscript itself are available at the following link: https://github.com/kguidonimartins/betadiv-enp
+
+
+# References
+
+
+<div id="refs"></div>
+
+
+# Tables
+
+
+```{r overwrite_chunk_settings_for_results, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  eval = TRUE,
+  include = TRUE,
+  fig.height = 10,
+  fig.width = 10,
+  results = "asis",
+  root.dir = here::here()
+)
+
+options(knitr.kable.NA = "")
+
+```
+
+
+```{r print_permanova_table}
+
+cat(TABLE_CAPTION_PERMANOVA)
+
+suppressMessages({
+  permanova_table <-
+    here::here("output", "tables", "permanova_table.csv") %>%
+    read_csv()
+})
+
+permanova_table %>%
+  transmute(
+    Similarity = name,
+    Predictor = term,
+    "Degrees of freedom" = df,
+    "*F*" = statistic,
+    "R^2^" = R2,
+    `*P*-value` = p_value
+  ) %>%
+  knitr::kable(align = "llrrrr")
+
+```
+
+
+```{r print_permdisp_table}
+
+cat(TABLE_CAPTION_PERMDISP)
+
+suppressMessages({
+  permdisp_table <-
+    here::here("output", "tables", "permdisp_table.csv") %>%
+    read_csv()
+})
+
+permdisp_table %>%
+  transmute(
+    Similarity = name,
+    "*F*" = F,
+    `*P*-value` = `Pr(>F)`
+  ) %>%
+  knitr::kable(align = "llrrr")
+
+```
+
+
+```{r print_linear_model_table}
+
+cat(TABLE_CAPTION_LM)
+
+suppressMessages({
+  ancova_table <-
+    here::here("output", "tables", "regression_test_by_permutation.csv") %>%
+    read_csv()
+})
+
+ancova_table %>%
+  mutate_if(is.numeric, ~format(., digits = 1, nsmal = 3)) %>%
+  rename(
+    Similarity = similarity_type,
+    `Intercept difference` = dif.int1_int2,
+    `*P*-value intercept` = p.i,
+    `Slope difference` = dif.slo1_slo2,
+    `*P*-value slope` = p.s
+  ) %>%
+  kable(align = "lrrrr")
+
+```
+
+
+# Captions
+
+
+```{r fig-cap-map}
+
+cat(FIGURE_CAPTION_MAP_EMAS)
+
+```
+
+
+```{r fig-cap-t-test}
+
+cat(FIGURE_CAPTION_T_TEST)
+
+```
+
+
+```{r fig-cap-pcoa}
+
+cat(FIGURE_CAPTION_PCOA)
+
+```
+
+
+```{r fig-cap-dist-decay}
+
+cat(FIGURE_CAPTION_DISTANCE_DECAY)
+
+```
+
+
+# Figures
+
+
+```{r print_map}
+
+FIGURE_MAP <- here::here("output/figures/trim/map_emas.tiff")
+grid::grid.raster(readTIFF(source = FIGURE_MAP))
+
+```
+
+
+```{r print_richness}
+
+FIGURE_RICHNESS <- here::here("output/figures/trim/paired_richness.tiff")
+grid::grid.raster(readTIFF(source = FIGURE_RICHNESS))
+
+```
+
+
+```{r print_pcoa}
+
+FIGURE_PCOA <- here::here("output/figures/trim/pcoa_plate.tiff")
+grid::grid.raster(readTIFF(source = FIGURE_PCOA))
+
+```
+
+
+```{r print_distance_decay}
+
+FIGURE_DISTANCE_DECAY <- here::here("output/figures/trim/distance_decay_plate.tiff")
+grid::grid.raster(readTIFF(source = FIGURE_DISTANCE_DECAY))
+
+```
+
+
+# Appendix
+
+
+```{r print-table-abundance-comparison}
+
+cat(TABLE_CAPTION_ABUNDANCE_COMPARISON)
+
+compare_abund %>%
+  mutate(
+    genus_epithet = get_genus_epithet(species),
+    author = get_authority(species),
+    species = paste0("*", genus_epithet, "* ", author),
+    species = ifelse(nchar(author) == 0, genus_epithet, species)
+  ) %>%
+  select(-genus_epithet, -author) %>%
+  rename(
+    Species = species,
+    "High fire frequency (firebreaks)" = burned,
+    "Natural fire frequency" = unburned
+  ) %>%
+  kable(align = "lcc")
+
+```

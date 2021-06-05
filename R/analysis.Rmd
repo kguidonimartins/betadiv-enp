@@ -1,0 +1,827 @@
+---
+title: analysis
+output:
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    highlight: tango
+params:
+  show_results: FALSE
+---
+
+```{r knitr_setup_analysis, include=FALSE}
+
+if (!require("here")) install.packages("here")
+if (!require("remotes")) install.packages("remotes")
+if (!require("renv")) remotes::install_github("rstudio/renv")
+
+show_results <- params$show_results
+
+knitr::opts_chunk$set(
+                    echo = show_results,
+                    eval = TRUE,
+                    include = params$show_results,
+                    cache = TRUE
+                  )
+
+```
+
+```{r pkg_setup, include = FALSE}
+
+source(here::here("R", "local_functions.R"))
+
+package_list <-
+  c(
+    "betapart",
+    "bibtex",
+    "broom",
+    "captioner",
+    "conflicted",
+    "cowplot",
+    "crayon",
+    "dplyr",
+    "flora",
+    "forcats",
+    "fs",
+    "ggplot2",
+    "ggsn",
+    "glue",
+    "grid",
+    "gridExtra",
+    "here",
+    "knitr",
+    "magick",
+    "purrr",
+    "RColorBrewer",
+    "readr",
+    "remotes",
+    "rmarkdown",
+    "sf",
+    "stringr",
+    "tibble",
+    "tidyr",
+    "tiff",
+    "usethis",
+    "vegan"
+  )
+
+ipak(package_list)
+
+fs::dir_create(here::here("output/tables"))
+fs::dir_create(here::here("output/figures/trim"))
+
+update_description(package_list)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+conflict_prefer("map", "purrr")
+
+table_cap <- captioner::captioner(prefix = "Table")
+
+table_cap_supp <- captioner::captioner(prefix = "Table A", auto_space = FALSE)
+
+table_ref <- function(label) {
+  stringr::str_extract(label, "[^:]*")
+}
+
+figure_cap <- captioner::captioner(prefix = "Figure")
+
+figure_cap_supp <- captioner::captioner(prefix = "Figure A", auto_space = FALSE)
+
+figure_ref <- function(label) {
+  stringr::str_extract(label, "[^:]*")
+}
+
+write.bib(package_list, here::here("manuscript", "sources", "installed-r-packages.bib"))
+
+```
+
+<!-- # data entry -->
+
+```{r data-entry}
+
+df <- read_csv(here::here("data", "community-table.csv"))
+
+xy <- read_csv(here::here("data", "community-geo-coordinates.csv"))
+
+```
+
+<!-- # map for enp -->
+
+```{r enp_map}
+
+if (!file.exists(here::here("output", "figures", "map_emas.tiff"))) {
+
+  southam <- sf::read_sf(here::here("data", "shapefiles", "south-america", "sa.shp"))
+
+  cerrado <- sf::read_sf(here::here("data", "shapefiles", "cerrado", "cerrado.shp"))
+
+  enp <- sf::read_sf(here::here("data", "shapefiles", "emas-national-park", "enp.shp"))
+
+  theme_set(
+    theme_bw(base_size = 16, base_family = "Times") +
+    theme(
+      plot.background = element_rect(fill = "white"),
+      panel.border = element_rect(color = "black"),
+      axis.text.x = element_text(colour = "black"),
+      axis.text.y = element_text(colour = "black"),
+      axis.title = element_blank(),
+      axis.ticks.length = unit(0, "pt"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+  )
+
+  enp_center <- enp %>%
+    st_bbox() %>%
+    st_as_sfc() %>%
+    st_coordinates() %>%
+    as_tibble() %>%
+    head(1)
+
+  southam_enp_center <-
+    ggplot() +
+    geom_sf(data = southam, fill = "grey", lwd = 0) +
+    geom_sf(data = cerrado, fill = "grey20", lwd = 0) +
+    xlim(c(-90, -30)) +
+    geom_point(
+      data = enp_center,
+      aes(x = X, y = Y),
+      size = 2,
+      pch = 21,
+      colour = "black",
+      fill = "white"
+    ) +
+    labs(x = "",
+         y = "") +
+    theme_bw() +
+    theme(
+      panel.border = element_rect(fill = "transparent", color = "transparent"),
+      axis.text = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      panel.background = element_blank(),
+      plot.background = element_rect(fill = "transparent", color = "transparent"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+
+  southam_enp_center
+
+  enp_points <-
+    ggplot() +
+    geom_sf(
+      data = enp,
+      fill = "grey",
+      lwd = 0
+    ) +
+    geom_point(
+      data = xy,
+      aes(x = Long, y = Lat),
+      size = 2,
+      pch = 22,
+      colour = "black",
+      fill = "white"
+    ) +
+    north(
+      data = enp,
+      location = "topleft",
+      symbol = 12
+    ) +
+    scalebar(
+      data = enp,
+      location = "bottomleft",
+      dist = 10,
+      dist_unit = "km",
+      model = "WGS84",
+      transform = TRUE,
+      st.dist = 0.03,
+      st.size = 3
+    ) +
+    scale_x_continuous(breaks = seq(-53.1, -52.7, by = 0.1))
+
+  enp_points
+
+  map_emas <- ggdraw() +
+    draw_plot(enp_points) +
+    draw_plot(southam_enp_center, x = 0.62, y = 0.70, width = 0.3, height = 0.3)
+
+  map_emas
+
+  save_plot(map_emas, format = "tiff", trim = TRUE, overwrite = TRUE)
+
+}
+
+```
+
+<!-- # t test analysis and plot -->
+
+```{r t_test}
+
+df_pa <-
+  df %>%
+  column_to_rownames("plot") %>%
+  decostand(., "pa")
+
+richness <-
+  data.frame("spp_richness" = rowSums(df_pa)) %>%
+  rownames_to_column("pair") %>%
+  mutate(
+    condition = str_remove(pair, pattern = "beta[0-9]."),
+    pair = str_extract(pair, "beta[0-9].")
+  )
+
+sampling_units <- richness %>% distinct(pair) %>% pull()
+
+richness_wider <-
+  richness %>%
+  pivot_wider(
+    names_from = "condition",
+    values_from = "spp_richness"
+  )
+
+n_higher_richness <-
+  richness_wider %>%
+  filter(unburned >= burned) %>%
+  nrow(.)
+
+t_test_result <-
+  richness_wider %>%
+  rename_if(is.numeric, paste0, "_richness") %>%
+  {
+    t.test(
+      x = .$unburned_richness,
+      y = .$burned_richness,
+      paired = TRUE
+    )
+  }
+
+not_nodf <-
+  richness_wider %>%
+  filter(burned > unburned)
+
+if (!file.exists(here::here("output", "figures", "paired_richness.tiff"))) {
+
+  paired_richness <-
+    richness %>%
+    filter(!pair %in% not_nodf$pair) %>%
+    ggplot(aes(x = condition, y = spp_richness, group = pair)) +
+    geom_line(aes(group = pair), size = 1, alpha = 0.5) +
+    geom_line(data = richness %>% filter(pair %in% not_nodf$pair), linetype = "dashed", size = 1, alpha = 0.5) +
+    geom_point(size = 4, alpha = 0.5) +
+    geom_point(data = richness %>% filter(pair %in% not_nodf$pair), size = 4, alpha = 0.5) +
+    scale_x_discrete(
+      limits = c("unburned", "burned"),
+      labels = c("Natural fire frequency", "High fire frequency")
+    ) +
+    # scale_y_continuous(
+    #   breaks = scales::pretty_breaks(30)
+    #   ) +
+    labs(
+      x = "",
+      y = "Species richness"
+    ) +
+    ylim(c(10, 25)) +
+    theme_bw(base_size = 16, base_family = "Times") +
+    theme(
+      axis.title.x = element_text(size = 16, colour = "black"),
+      axis.title.y = element_text(size = 16, colour = "black"),
+      axis.text.x = element_text(size = 12, colour = "black"),
+      axis.text.y = element_text(size = 12, colour = "black"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.title = element_blank(),
+      panel.background = element_rect(colour = "black")
+    )
+
+  paired_richness
+
+  save_plot(paired_richness, format = "tiff", trim = TRUE, overwrite = TRUE)
+
+}
+
+```
+
+<!-- # data wrangling for ancova and permanova/permdisp -->
+
+```{r data-wrangling-ancova-perm}
+
+df_list <- df %>%
+  mutate(fire_type = str_remove(plot, "beta[0-9].")) %>%
+  column_to_rownames("plot") %>%
+  split(.$fire_type) %>%
+  map(~select(.x, -fire_type)) %>%
+  map(~.x[, colSums(.x) != 0])
+
+all_similarities <-
+  bind_rows(
+    df_list %>%
+    map(~make_similarity(.x, "Sorensen", xy)) %>%
+    enframe() %>%
+    unnest(cols = c(value)),
+    df_list %>%
+    map(~make_similarity(.x, "Simpson (turnover)", xy)) %>%
+    enframe() %>%
+    unnest(cols = c(value)),
+    df_list %>%
+    map(~make_similarity(.x, "Richness difference (nestedness)", xy)) %>%
+    enframe() %>%
+    unnest(cols = c(value)),
+    df_list %>%
+    map(~make_similarity(.x, "Bray-Curtis", xy)) %>%
+    enframe() %>%
+    unnest(cols = c(value))
+  ) %>%
+  rename(factor_type = name) %>%
+  mutate(
+    factor_type = case_when(
+      factor_type == "burned" ~ "High fire frequency",
+      factor_type == "unburned" ~ "Natural fire frequency"
+    ),
+    similarity_type = factor(
+      similarity_type,
+      levels = c(
+        "Sorensen",
+        "Simpson (turnover)",
+        "Richness difference (nestedness)",
+        "Bray-Curtis"
+      )
+    )
+  ) %>%
+  arrange(similarity_type)
+
+```
+
+<!-- # ancova -->
+
+```{r, ancova_distance_decay}
+
+if (!file.exists(here::here("output", "figures", "distance_decay_plate.tiff"))) {
+
+  distance_decay_plate <-
+    all_similarities %>%
+    mutate(
+      similarity_type = factor(
+        similarity_type,
+        levels = c(
+          "Sorensen",
+          "Simpson (turnover)",
+          "Richness difference (nestedness)",
+          "Bray-Curtis"
+        )
+      )
+    ) %>%
+    arrange(similarity_type) %>%
+    ggplot(
+      aes(
+        x = spatial_distance,
+        y = similarity_value,
+        color = factor_type
+      )
+    ) +
+    geom_point(
+      size = 2,
+      alpha = 0.6
+    ) +
+    scale_color_manual(
+      values = c(
+        "red",
+        "blue"
+      )
+    ) +
+    facet_wrap(~similarity_type) +
+    labs(
+      x = "Spatial distance",
+      y = "Similarity"
+    ) +
+    geom_smooth(method = "lm", se = FALSE) +
+    theme_bw(base_size = 16, base_family = "Times") +
+    theme(
+      axis.title.x = element_text(size = 14, colour = "black"),
+      axis.title.y = element_text(size = 14, colour = "black"),
+      axis.text.x = element_text(size = 10, colour = "black"),
+      axis.text.y = element_text(size = 10, colour = "black"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.title = element_blank(),
+      legend.position = c(0.38, 0.97),
+      legend.background = element_rect(fill = alpha("white", 0.0)),
+      legend.box.background = element_blank(),
+      legend.key = element_blank(),
+      legend.text = element_text(size = 8),
+      panel.background = element_rect(colour = "black")
+    ) +
+    guides(color = guide_legend(keyheight = 0.7, override.aes = list(fill = NA)))
+
+  distance_decay_plate
+
+  save_plot(distance_decay_plate, format = "tiff", trim = TRUE, overwrite = TRUE)
+
+}
+
+regression_test_by_permutation <- here::here("output", "tables",
+                                             "regression_test_by_permutation.csv")
+
+if (!file.exists(regression_test_by_permutation)) {
+
+  sim_types <- unique(all_similarities$similarity_type)
+
+  result.regre.perm <- matrix(, 4, 4)
+  colnames(result.regre.perm) <- c("dif.int1_int2", "p.i", "dif.slo1_slo2", "p.s")
+  rownames(result.regre.perm) <- sim_types
+
+  for (i in seq_along(sim_types)) {
+
+    tmpdf <- all_similarities %>% filter(similarity_type == sim_types[i])
+
+    vec_y1 <-
+      tmpdf %>%
+      filter(factor_type == "High fire frequency") %>%
+      pull(similarity_value)
+
+    vec_y2 <-
+      tmpdf %>%
+      filter(factor_type == "Natural fire frequency") %>%
+      pull(similarity_value)
+
+    vec_xy <-
+      tmpdf %>%
+      filter(factor_type == "High fire frequency") %>%
+      pull(spatial_distance)
+
+    set.seed(2020)
+
+    result.regre.perm[sim_types[i], ] <- dif.coefs(y1 = vec_y1, y2 = vec_y2, x = vec_xy)
+
+  }
+
+  result.regre.perm %>%
+    as.data.frame() %>%
+    rownames_to_column("similarity_type") %>%
+    write_csv(regression_test_by_permutation)
+
+}
+
+```
+
+<!-- # manova -->
+
+```{r, permanova_permdisp_plot}
+
+df_clean <-
+  df %>%
+  column_to_rownames("plot")
+
+groups_fire <-
+  df %>%
+  mutate(plot = str_remove(plot, "beta[0-9].")) %>%
+  pull(plot) %>%
+  as.factor()
+
+pairs_fire <-
+  df %>%
+  mutate(plot = str_extract(plot, "beta[0-9].")) %>%
+  pull(plot) %>%
+  as.factor()
+
+df_clean_list <-
+  list(
+    "Bray-Curtis" = vegdist(df_clean, "bray"),
+    "Richness difference (nestedness)" = betapart::beta.pair(x = decostand(df_clean, "pa"), index.family = "sorensen")$beta.sne,
+    "Simpson (turnover)" = beta.pair(x = decostand(df_clean, "pa"), index.family = "sorensen")$beta.sim,
+    "Sorensen" = beta.pair(x = decostand(df_clean, "pa"), index.family = "sorensen")$beta.sor
+  )
+
+set.seed(2020)
+permanovas <- df_clean_list %>%
+  map(~adonis2(formula = as.dist(.x) ~ groups_fire + pairs_fire))
+
+permanovas
+
+permanova_table <- here::here("output", "tables", "permanova_table.csv")
+
+if (!file.exists(permanova_table)) {
+
+  suppressWarnings({
+
+    # because broom do not recognize columns
+    # names, but the values are ok.
+    permanova_tidy_results <-
+      permanovas %>%
+      map(~tidy(.x)) %>%
+      enframe() %>%
+      unnest(cols = c(value)) %>%
+      mutate_if(is.numeric, ~round(., 2)) %>%
+      mutate(
+        name = factor(
+          name,
+          levels = c(
+            "Sorensen",
+            "Simpson (turnover)",
+            "Richness difference (nestedness)",
+            "Bray-Curtis"
+          )
+        )
+      ) %>%
+      arrange(name) %>%
+      mutate(
+        name = c(
+          levels(.$name)[1], NA, NA, NA,
+          levels(.$name)[2], NA, NA, NA,
+          levels(.$name)[3], NA, NA, NA,
+          levels(.$name)[4], NA, NA, NA
+        )
+      ) %>%
+      filter(term %in% c("groups_fire", "pairs_fire")) %>%
+      mutate(
+        p_value = if_else(
+          condition = p.value < 0.001 | p.value == 0,
+          true = paste("<0.001"),
+          false = paste(format(p.value, digits = 4, nsmall = 3))
+        )
+      ) %>%
+      mutate(
+        term = case_when(
+          term == "groups_fire" ~ "Fire frequency",
+          term == "pairs_fire" ~ "Pairs",
+          TRUE ~ as.character(term)
+        ),
+        df = as.character(df)
+      ) %>%
+      mutate_if(is.numeric, ~format(., digits = 3, nsmall = 3))
+
+      permanova_tidy_results
+
+      permanova_tidy_results %>%
+        write_csv(permanova_table)
+
+  })
+
+} else {
+
+  permanova_table <- read_csv(permanova_table)
+
+}
+
+permdisps <- df_clean_list %>%
+  map(~betadisper(.x, groups_fire))
+
+permdisps
+
+permdisp_table <- here::here("output", "tables", "permdisp_table.csv")
+
+if (!file.exists(permdisp_table)) {
+
+  permdisp_tidy_results <-
+    permdisps %>%
+    map(~permutest(.x)) %>%
+    map(~.x$tab) %>%
+    map(~rownames_to_column(.x, "term")) %>%
+    enframe() %>%
+    unnest(cols = c(value)) %>%
+    filter(term == "Groups") %>%
+    mutate(
+      name = factor(
+        name,
+        levels = c(
+          "Sorensen",
+          "Simpson (turnover)",
+          "Richness difference (nestedness)",
+          "Bray-Curtis"
+        )
+      )
+    ) %>%
+    arrange(name) %>%
+    mutate(
+      term = "Fire frequency",
+      Df = as.character(Df)
+    ) %>%
+    mutate_if(is.numeric, ~format(., digits = 3, nsmall = 3))
+
+  permdisp_tidy_results
+
+  permdisp_tidy_results %>%
+    write_csv(permdisp_table)
+
+} else {
+
+  permdisp_table <- read_csv(permdisp_table)
+
+}
+
+permdisp_vectors <- permdisps %>%
+  map(~get_permdisp_vectors(.x)) %>%
+  enframe() %>%
+  unnest(cols = c(value)) %>%
+  mutate(
+    name = factor(
+      name,
+      levels = c(
+        "Sorensen",
+        "Simpson (turnover)",
+        "Richness difference (nestedness)",
+        "Bray-Curtis"
+      )
+    )
+  ) %>%
+  arrange(name)
+
+permdisp_polygons <- permdisps %>%
+  map(~get_permdisp_vectors(.x)) %>%
+  map(~get_permdisp_polygons(.x)) %>%
+  enframe() %>%
+  unnest(cols = c(value)) %>%
+  mutate(
+    name = factor(
+      name,
+      levels = c(
+        "Sorensen",
+        "Simpson (turnover)",
+        "Richness difference (nestedness)",
+        "Bray-Curtis"
+      )
+    )
+  ) %>%
+  arrange(name)
+
+permdisps %>%
+  map(~(.x$eig[1] / sum(.x$eig)) * 100) %>%
+  enframe() %>%
+  unnest(cols = c(value))
+
+permdisps %>%
+  map(~(.x$eig[2] / sum(.x$eig)) * 100) %>%
+  enframe() %>%
+  unnest(cols = c(value))
+
+if (!file.exists(here::here("output", "figures", "pcoa_plate.tiff"))) {
+
+  pcoa_plate <-
+    ggplot() +
+    geom_polygon(
+      data = permdisp_polygons,
+      aes(
+        x = PCoA1,
+        y = PCoA2,
+        fill = veg_type,
+        group = veg_type
+      ),
+      alpha = 0.10
+    ) +
+    scale_fill_manual(
+      values = c(
+        "High fire frequency" = "red",
+        "Natural fire frequency"  = "blue"
+      )
+    ) +
+    geom_point(
+      data = permdisp_vectors,
+      aes(
+        x = PCoA1,
+        y = PCoA2,
+        colour = veg_type
+      ),
+      size = 3
+    ) +
+    scale_colour_manual(
+      values = c(
+        "High fire frequency" = "red",
+        "Natural fire frequency"  = "blue"
+      )
+    ) +
+    theme_bw(base_size = 16, base_family = "Times") +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14),
+      panel.background = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      plot.background = element_blank(),
+      legend.title = element_blank(),
+      legend.position = c(0.40, 0.65),
+      legend.background = element_rect(fill = alpha("white", 0.0)),
+      legend.box.background = element_blank(),
+      legend.text = element_text(size = 6)
+    ) +
+    guides(color = guide_legend(keyheight = 0.1)) +
+    labs(
+      colour = "Vegetation condition",
+      fill   = "Vegetation condition"
+    ) +
+    facet_wrap(~name, scale = "free") +
+    geom_line(
+      data = permdisp_vectors,
+      aes(
+        x = PCoA1,
+        y = PCoA2,
+        group = factor(pair)
+      )
+    )
+
+  pcoa_plate
+
+  save_plot(pcoa_plate, format = "tiff", trim = TRUE, overwrite = TRUE)
+
+}
+
+```
+
+<!-- # get taxa info -->
+
+```{r taxa_info}
+
+taxa_info <- here::here("output", "tables", "taxa_info.csv")
+
+df_com <-
+  df %>%
+  column_to_rownames("plot")
+
+if (!file.exists(taxa_info)) {
+
+  taxa_query <-
+    df_com %>%
+    names() %>%
+    get.taxa()
+
+  taxa_query %>%
+    write_csv(taxa_info)
+
+} else {
+
+  taxa_query <-
+    read_csv(taxa_info)
+
+}
+
+abundances_between_treatments <- here::here("output", "tables", "abundances_between_treatments.csv")
+
+if (!file.exists(abundances_between_treatments)) {
+
+  compare_abund <-
+    df_com %>%
+    rownames_to_column("treatment") %>%
+    pivot_longer(cols = -treatment, names_to = "species", values_to = "abundance") %>%
+    mutate(treatment = str_remove(treatment, "beta[0-9].")) %>%
+    group_by(treatment, species) %>%
+    summarise(abundance = sum(abundance, na.rm = TRUE)) %>%
+    pivot_wider(names_from = treatment, values_from = abundance) %>%
+    mutate_if(is.numeric, list(~ na_if(., "unknown"))) %>%
+    full_join(taxa_query, by = c("species" =  "original.search")) %>%
+    mutate(species = ifelse(is.na(scientific.name), species, scientific.name)) %>%
+    select(species, burned, unburned) %>%
+    mutate(species = case_when(
+             species == "Solanum L." ~ "Solanum sp.",
+             species == "Cipo escandente" ~ "Sp 1",
+             species == "Asteraceae Bercht. & J.Presl" ~ "Sp 2",
+             TRUE ~ as.character(species)
+           )
+           ) %>%
+    arrange(species)
+
+
+  compare_abund %>%
+    write_csv(abundances_between_treatments)
+
+} else {
+
+  compare_abund <-
+    read_csv(abundances_between_treatments)
+
+}
+
+compare_abund %>%
+  as.data.frame()
+
+compare_abund %>%
+  mutate_if(is.numeric, ~ ifelse(. != 0, 1, 0)) %>%
+  select(-species) %>%
+  pivot_longer(cols = everything()) %>%
+  group_by(name) %>%
+  summarise(sum(value), mean(value), sd(value))
+
+richness_stats <-
+  full_join(
+    x = richness %>%
+      group_by(condition) %>%
+      summarise(mean_spp = mean(spp_richness), sd_spp = sd(spp_richness)),
+    y = df_com %>%
+      rownames_to_column("condition") %>%
+      mutate(condition = str_remove(condition, "beta[0-9].")) %>%
+      pivot_longer(-condition) %>%
+      filter(value != 0) %>%
+      select(-value) %>%
+      distinct() %>%
+      group_by(condition) %>%
+      summarise(count_spp = n()),
+    by = "condition"
+  )
+
+burned_richness <- richness_stats %>% filter(condition == "burned") %>% pull(count_spp)
+unburned_richness <- richness_stats %>% filter(condition == "unburned") %>% pull(count_spp)
+
+```

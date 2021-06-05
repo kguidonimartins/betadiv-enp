@@ -1,0 +1,5 @@
+renv/library
+output/tables
+main-script_cache
+R/analysis_cache
+manuscript/betadiv-enp_files

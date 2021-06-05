@@ -1,0 +1,9 @@
+name,term,df,SumOfSqs,R2,statistic,p.value,p_value
+Sorensen,Fire frequency,1,0.210,0.050,3.550,0.000,<0.001
+NA,Pairs,19,3.170,0.710,2.860,0.000,<0.001
+Simpson (turnover),Fire frequency,1,0.140,0.040,3.510,0.010,0.010
+NA,Pairs,19,2.470,0.730,3.240,0.000,<0.001
+Richness difference (nestedness),Fire frequency,1,0.010,0.080,4.400,0.070,0.070
+NA,Pairs,19,0.090,0.580,1.690,0.170,0.170
+Bray-Curtis,Fire frequency,1,0.270,0.040,3.190,0.000,<0.001
+NA,Pairs,19,5.000,0.730,3.110,0.000,<0.001

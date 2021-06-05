@@ -1,0 +1,46 @@
+Package: betadiv-enp
+Title: Do not matter
+Version: 0.0.1
+Authors@R:
+    person(given = "Karlo",
+           family = "Guidoni Martins",
+           role = c("aut", "cre"),
+           email = "kguidonimartins@gmail.com",
+           comment = c(ORCID = "0000-0002-8458-8467"))
+License: CC BY 4.0
+Imports:
+    betapart,
+    bibtex,
+    broom,
+    captioner,
+    conflicted,
+    cowplot,
+    crayon,
+    dplyr,
+    flora,
+    forcats,
+    fs,
+    ggplot2,
+    ggsn,
+    glue,
+    grid,
+    gridExtra,
+    here,
+    knitr,
+    magick,
+    purrr,
+    RColorBrewer,
+    readr,
+    remotes,
+    rmarkdown,
+    sf,
+    stringr,
+    tibble,
+    tidyr,
+    tiff,
+    usethis,
+    vegan
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

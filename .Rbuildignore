@@ -1,0 +1,7 @@
+^renv$
+^renv\.lock$
+^\.github$
+^LICENSE\.md$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.dir-locals\.el$

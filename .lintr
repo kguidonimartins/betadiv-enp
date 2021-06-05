@@ -1,0 +1,32 @@
+linters: with_defaults(
+    line_length_linter = NULL, # 69
+    trailing_whitespace_linter = NULL, # 60
+    infix_spaces_linter = NULL, # 55
+    object_name_linter = NULL, # 40
+    assignment_linter = NULL, # 32
+    commas_linter = NULL, # 28
+    paren_brace_linter = NULL, # 12
+    spaces_inside_linter = NULL, # 9
+    spaces_left_parentheses_linter = NULL, # 9
+    object_usage_linter = NULL, # 7
+    commented_code_linter = NULL, # 5
+    no_tab_linter = NULL, # 5
+    function_left_parentheses_linter = NULL, # 2
+    object_length_linter = NULL, # 2
+    cyclocomp_linter = NULL, # 1
+    seq_linter = NULL, # 1
+    trailing_blank_lines_linter = NULL, # 1
+    dummy_linter = NULL
+  )
+exclusions: list(
+    "data/community-geo-coordinates.csv",
+    "data/community-table.csv",
+    "data/shapefiles/emas-national-park/enp.dbf",
+    "data/shapefiles/emas-national-park/enp.prj",
+    "data/shapefiles/emas-national-park/enp.shp",
+    "data/shapefiles/emas-national-park/enp.shx",
+    "data/shapefiles/south-america/sa.dbf",
+    "data/shapefiles/south-america/sa.prj",
+    "data/shapefiles/south-america/sa.shp",
+    "data/shapefiles/south-america/sa.shx"
+  )
