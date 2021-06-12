@@ -2,6 +2,7 @@
 
 [![docker-upload-artifacts](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-upload-artifacts.yaml/badge.svg)](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-upload-artifacts.yaml)
 [![docker-build-push](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-build-push.yaml/badge.svg)](https://github.com/kguidonimartins/betadiv-enp/actions/workflows/docker-build-push.yaml)
+[![DOI](https://zenodo.org/badge/298058948.svg)](https://zenodo.org/badge/latestdoi/298058948)
 
 Code, data, and author's manuscript accompanying the publication:
 
