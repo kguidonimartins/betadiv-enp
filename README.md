@@ -5,7 +5,7 @@
 
 Code, data, and author's manuscript accompanying the publication:
 
-#### Karlo G. Guidoni-Martins [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-8458-8467), Leandro Maracahipes [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6148-3291), Adriano S. Melo [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-4695-2854), Marcus V. Cianciaruso [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0001-5866-5345). *Annual fires reduce local species richness but do not homogenize the composition of savanna woody species*.  Published in *Flora*, 2 June 2021 <https://doi.org/>
+#### Karlo G. Guidoni-Martins [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-8458-8467), Leandro Maracahipes [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-6148-3291), Adriano S. Melo [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0002-4695-2854), Marcus V. Cianciaruso [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0001-5866-5345). *Annual fires reduce local species richness but do not homogenize the composition of savanna woody species*.  Published in *Flora*, 2 June 2021 <https://doi.org/10.1016/j.flora.2021.151868>
 
 ## Overview
 
@@ -37,4 +37,3 @@ betadiv-enp/
 This research was funded by [CNPq](https://www.gov.br/cnpq/pt-br), [CAPES](https://www.gov.br/capes/pt-br), and [FAPEG](http://www.fapeg.go.gov.br/).
 
 We also thank the amazing [`#rstats`](https://twitter.com/search?q=%23rstats&src=typed_query) community, making it possible to build this research paper using only free/open source tools.
-
